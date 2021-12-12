@@ -275,7 +275,7 @@ void setup(void)
   }
 WiFi.setAutoReconnect(true);
 WiFi.persistent(true);
-MDNS.begin("led");
+
 
 #if defined(__AVR_ATtiny85__) && (F_CPU == 16000000)
   clock_prescale_set(clock_div_1);
