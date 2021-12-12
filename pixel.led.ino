@@ -260,7 +260,11 @@ void request()
 void setup(void)
 {
 
- // WiFi.softAP("led",""); To turn on wifi
+
+
+  strip.begin();            // INITIALIZE NeoPixel strip object (REQUIRED)
+  strip.show();             // Turn OFF all pixels ASAP
+  strip.setBrightness(255); // Set BRIGHTNESS to about 1/5 (max = 255)   
   WiFi.begin(ssid, password); //Connect to your WiFi router
 
   while (WiFi.status() != WL_CONNECTED)
@@ -276,10 +280,6 @@ MDNS.begin("led");
 #if defined(__AVR_ATtiny85__) && (F_CPU == 16000000)
   clock_prescale_set(clock_div_1);
 #endif
-
-  strip.begin();            // INITIALIZE NeoPixel strip object (REQUIRED)
-  strip.show();             // Turn OFF all pixels ASAP
-  strip.setBrightness(255); // Set BRIGHTNESS to about 1/5 (max = 255)   
   colorWipe(strip.Color(green, red, blue), 0);
   
   request();
