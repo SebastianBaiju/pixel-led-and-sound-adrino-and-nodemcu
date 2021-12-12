@@ -1,0 +1,243 @@
+
+
+#include <Adafruit_NeoPixel.h>
+#ifdef __AVR__
+ #include <avr/power.h> et
+#endif
+
+#define LED_PIN    D4
+
+#define LED_COUNT 50
+#define S0 D0
+#define S1 D1
+#define S2 D2
+#define S3 D3
+#define sensorOut D8
+
+
+int redMin = 38; // Red minimum value
+int redMax = 2339; // Red maximum value
+int greenMin = 28; // Green minimum value
+int greenMax = 3329; // Green maximum value
+int blueMin = 38; // Blue minimum value
+int blueMax = 3200; // Blue maximum valuevalue
+
+
+int redPW = 0;
+int greenPW = 0;
+int bluePW = 0;
+
+
+int redValue;
+int greenValue;
+int blueValue;
+
+
+Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
+
+
+void setup() {
+  
+  // Set S0 - S3 as outputs
+  pinMode(S0, OUTPUT);
+  pinMode(S1, OUTPUT);
+  pinMode(S2, OUTPUT);
+  pinMode(S3, OUTPUT);
+  
+  // Set Sensor output as input
+  pinMode(sensorOut, INPUT);
+  
+  // Set Frequency scaling to 20%
+  digitalWrite(S0,HIGH);
+  digitalWrite(S1,LOW);
+    Serial.begin(9600);
+  
+#if defined(__AVR_ATtiny85__) && (F_CPU == 16000000)
+  clock_prescale_set(clock_div_1);
+#endif
+  strip.begin();           // INITIALIZE NeoPixel strip object (REQUIRED)
+  strip.show();            // Turn OFF all pixels ASAP
+  strip.setBrightness(255); // Set BRIGHTNESS to about 1/5 (max = 255)
+}
+
+
+
+void loop() {
+ 
+    // Read Red value
+  redPW = getRedPW();
+  // Map to value from 0-255
+  redValue = map(redPW, redMin,redMax,255,0);
+    delay(200);
+  greenPW = getGreenPW();
+  // Map to value from 0-255
+  greenValue = map(greenPW, greenMin,greenMax,255,0);
+   delay(200);
+     bluePW = getBluePW();
+  // Map to value from 0-255
+  blueValue = map(bluePW, blueMin,blueMax,255,0);
+    delay(200);
+  
+  if( redValue > 214 && greenValue > 214 && blueValue > 210 ) {
+    Serial.print("white ");
+             redValue =255;
+             greenValue =255;
+             blueValue =255;
+  } else if (redValue < 200 && greenValue < 214 && blueValue < 210 )
+   {
+       if( redValue < 0){
+         redValue = 0;
+               }
+       if( greenValue < 0){
+         greenValue = 0;
+                      } 
+  
+      if( blueValue < 0){
+      blueValue = 0;
+                } 
+    
+    }
+  else {
+    
+        if ( redValue > 200) {
+            Serial.print("Red");
+                   redValue =255;
+                    blueValue = 0;
+                     greenValue = 0;
+        }
+          if ( greenValue > 200) {
+              Serial.print("Green");
+              blueValue = 0;
+              greenValue =255;
+               redValue =0;
+            }
+
+
+           if ( blueValue >  200) {
+              Serial.print("blue");
+                blueValue =255;
+                greenValue = 0;
+                redValue = 0;
+            }
+      
+  }
+  
+  // Delay to stabilize sensor
+
+  // Fill along the length of the strip in various colors...
+   Serial.print("Red = ");
+  Serial.print(redValue);
+  Serial.print(" - Green = ");
+  Serial.print(greenValue);
+  Serial.print(" - Blue = ");
+  Serial.println(blueValue);
+  colorWipe(strip.Color(greenValue ,redValue  ,   blueValue),255); // Red
+ // colorWipe(strip.Color(  0, 255,   0), 50); // Green
+  //colorWipe(strip.Color(  0,   0, 255), 50); // Blue
+
+  // Do a theater marquee effect in various colors...
+ // theaterChase(strip.Color(127, 127, 127), 50); // White, half brightness
+ // theaterChase(strip.Color(127,   0,   0), 50); // Red, half brightness
+ // theaterChase(strip.Color(  0,   0, 127), 50); // Blue, half brightness
+
+  //rainbow(10);             // Flowing rainbow cycle along the whole strip
+  //theaterChaseRainbow(50); // Rainbow-enhanced theaterChase variant
+}
+
+
+void colorWipe(uint32_t color, int wait) {
+  for(int i=0; i<strip.numPixels(); i++) { // For each pixel in strip...
+    strip.setPixelColor(i, color);         //  Set pixel's color (in RAM)
+    strip.show();                          //  Update strip to match
+    //delay(wait);                           //  Pause for a moment
+  }
+}
+
+void theaterChase(uint32_t color, int wait) {
+  for(int a=0; a<10; a++) {  // Repeat 10 times...
+    for(int b=0; b<3; b++) { //  'b' counts from 0 to 2...
+      strip.clear();         //   Set all pixels in RAM to 0 (off)
+      // 'c' counts up from 'b' to end of strip in steps of 3...
+      for(int c=b; c<strip.numPixels(); c += 3) {
+        strip.setPixelColor(c, color); // Set pixel 'c' to value 'color'
+      }
+      strip.show(); // Update strip with new contents
+      delay(wait);  // Pause for a moment
+    }
+  }
+}
+
+void rainbow(int wait) {
+  
+  for(long firstPixelHue = 0; firstPixelHue < 5*65536; firstPixelHue += 256) {
+    for(int i=0; i<strip.numPixels(); i++) { // For each pixel in strip...
+      
+      int pixelHue = firstPixelHue + (i * 65536L / strip.numPixels());
+      
+      strip.setPixelColor(i, strip.gamma32(strip.ColorHSV(pixelHue)));
+    }
+    strip.show(); // Update strip with new contents
+    delay(wait);  // Pause for a moment
+  }
+}
+void theaterChaseRainbow(int wait) {
+  int firstPixelHue = 0;     // First pixel starts at red (hue 0)
+  for(int a=0; a<30; a++) {  // Repeat 30 times...
+    for(int b=0; b<3; b++) { //  'b' counts from 0 to 2...
+      strip.clear();         //   Set all pixels in RAM to 0 (off)
+      
+      for(int c=b; c<strip.numPixels(); c += 3) {
+       
+        int      hue   = firstPixelHue + c * 65536L / strip.numPixels();
+        uint32_t color = strip.gamma32(strip.ColorHSV(hue)); // hue -> RGB
+        strip.setPixelColor(c, color); // Set pixel 'c' to value 'color'
+      }
+      strip.show();                // Update strip with new contents
+      delay(wait);                 // Pause for a moment
+      firstPixelHue += 65536 / 90; // One cycle of color wheel over 90 frames
+    }
+  }
+}
+int getRedPW() {
+
+  // Set sensor to read Red only
+  digitalWrite(S2,LOW);
+  digitalWrite(S3,LOW);
+  // Define integer to represent Pulse Width
+  int PW;
+  // Read the output Pulse Width
+  PW = pulseIn(sensorOut, LOW);
+  // Return the value
+  return PW;
+
+}
+
+// Function to read Green Pulse Widths
+int getGreenPW() {
+
+  // Set sensor to read Green only
+  digitalWrite(S2,HIGH);
+  digitalWrite(S3,HIGH);
+  // Define integer to represent Pulse Width
+  int PW;
+  // Read the output Pulse Width
+  PW = pulseIn(sensorOut, LOW);
+  // Return the value
+  return PW;
+
+}
+
+// Function to read Blue Pulse Widths
+int getBluePW() {
+
+  // Set sensor to read Blue only
+  digitalWrite(S2,LOW);
+  digitalWrite(S3,HIGH);
+  // Define integer to represent Pulse Width
+  int PW;
+  // Read the output Pulse Width
+  PW = pulseIn(sensorOut, LOW);
+  // Return the value
+  return PW;
+
+}
