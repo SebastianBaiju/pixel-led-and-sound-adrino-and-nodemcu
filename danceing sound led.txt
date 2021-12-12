@@ -1,0 +1,138 @@
+
+
+#include <Adafruit_NeoPixel.h>
+#ifdef __AVR__
+ #include <avr/power.h> 
+#endif
+
+#define LED_PIN    D4
+#define LED_COUNT 60
+#define sensorPin D7
+
+const int SAMPLE_TIME = 115;
+unsigned long millisCurrent;
+unsigned long millisLast =  0;
+unsigned long millisElapsed = 0;
+int sampleBufferValue = 0;
+bool rec = true;
+long elp = 0;
+bool startValue = true;
+float sensorValue = 0;
+float filteredSignal = 1 ;
+int  signalvalue = 0;
+int valuedelay  = 0 ;
+
+Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
+
+void setup() {
+ 
+#if defined(__AVR_ATtiny85__) && (F_CPU == 16000000)
+  clock_prescale_set(clock_div_1);
+#endif
+ 
+  strip.begin();           
+  strip.show();            
+  strip.setBrightness(50); 
+}
+
+
+void loop() {
+
+   MainFunction();  
+    
+}
+
+
+void MainFunction() {
+  startValue = true;
+      while(rec) {
+        sound ();
+      }
+    rec = true;
+}
+void sound () {
+   millisCurrent = millis();
+    
+   millisElapsed = millisCurrent - millisLast;
+   if (digitalRead(sensorPin) == LOW) {
+     sampleBufferValue++;
+   }
+ 
+   if (millisElapsed > SAMPLE_TIME) {
+       rec = false;
+      millisLast = millisCurrent;
+    signalvalue =  sampleBufferValue;
+      signalvalue = mapfn(signalvalue, 0, 1000, 0, 25);;
+       colourSelection();
+       sampleBufferValue = 0;
+   }
+}
+
+int long mapfn(long x, long in_min, long in_max, long out_min, long out_max) {
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+void colourSelection() {
+  
+  if( signalvalue == 0) {
+    RGBColor(0, 0 , 0 );
+  }else {
+    switch (random(10)) {
+    case 1:
+    RGBColor(0, 0, 255);
+    break;
+     case 2:
+    RGBColor(0, 255, 255);
+    break;
+    case 3:
+    RGBColor(0, 127, 255);
+    break;
+    case 4:
+    RGBColor(0, 255, 127);
+    break;
+    case 5:
+    RGBColor(0, 255, 0);
+    break;
+    case 6:
+    RGBColor(255, 0, 255);
+    break;
+    case 7:
+   RGBColor(255, 255, 0);
+    break;
+     case 8:
+    RGBColor(255, 0, 127);
+    break;
+     case 9:
+     RGBColor(255, 0, 0);
+    break;
+    case 10:
+     RGBColor(0, 0, 255);
+    break;
+  default:
+    RGBColor(255, 127, 0);
+    break;
+
+    }
+  }
+}
+void RGBColor(int Rcolor, int Gcolor, int Bcolor) {
+valuedelay = 10;  
+colorWipe(strip.Color( Rcolor, Gcolor, Bcolor));
+signalvalue = 50;
+valuedelay = 0;
+colorWipe(strip.Color( 0, 0, 0 ));
+}
+
+void colorWipe(uint32_t color) {
+  for(int i=0; i<  signalvalue; i++) 
+  {
+    strip.setPixelColor(i, color);   
+    strip.setPixelColor((50 - i), color); 
+    strip.show();                         
+    delay(valuedelay);                          
+  }
+}
+
+
+
+
