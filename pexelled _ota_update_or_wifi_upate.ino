@@ -58,8 +58,8 @@ const char Mode[] PROGMEM =
 )=====";
 const char otaHtml [] PROGMEM = R"=====(<!DOCTYPE html><html> <head> <meta name="viewport" content="width=device-width, initial-scale=1.0"/> <script>window.onload=function (){const urlParams=new URLSearchParams(window.location.search); const slider=urlParams.get("slider"); if (slider){document.getElementById("slider").value=slider;}}function getValue(){location.search='?slider=' + document.getElementById("slider").value ;}</script> <style>body{background-color: #222;}.main{display: flex; justify-content: center; align-items: center; min-height: 50vh;}.arrow{width: 120px; justify-content: center; display: flex; flex-wrap: wrap;}.line{margin-top: 14px; width: 200px; background: white; height: 35px;}.point{width: 0; height: 0; border-left: 120px solid transparent; border-right: 120px solid transparent; border-bottom: 116px solid white;}.topnav{background-color: #333; overflow: hidden;}.topnav a{float: left; color: #f2f2f2; text-align: center; padding: 14px 16px; text-decoration: none; font-size: 17px;}.topnav a:hover{background-color: #ddd; color: black;}.topnav a.active{background-color: #1d1d1d; color: white;}.centre{display: flex;justify-content: center;color: white;}input[type="number"], select{padding: 12px 20px; margin: 8px 0; border: 1px solid #ccc; border-radius: 12px; color: white; box-sizing: border-box; background: #2a2a2a;}input[type="submit"]{width: 200px; display: block; background-color: #0d4aa7; color: white; padding: 14px 20px; margin: auto 0; margin-top: 28px; border: none; border-radius: 4px; cursor: pointer; height: 39px;}input[type="submit"]:hover{background-color: #1f82c4;}.di{border-radius: 20px; border: 1px solid; padding: 20px;}</style> </head> <body> <div class="topnav"> <a href="/">Picker</a> <a href="/music" >Music</a> <a href="/mode?head1=%23000000&color1=%23000000&modes=colorWipe&red=0&green=0&blue=0&red1=0&green1=0&blue1=0&delay=0" >Mode</a > <a class="active">ota</a> </div><div class="main"><div class="arrow"> <div class="point"></div><div class="line"></div><div class="line"></div><div class="line"></div></div></div><div class="centre"> <form action="/ota"> <div class="di"> <div class="pi"> <label class="blue">Enter the password : </label> <input type="number" id="password" name="pass" value="0"/> </div><input type="submit" value="Submit"> </div></form></div></body></html>)=====";
 const char otaMode[] PROGMEM = R"=====(<!DOCTYPE html><html> <head> <meta name="viewport" content="width=device-width, initial-scale=1.0"/> <script></script> <style>body{background-color: #222;}.main{display: flex; justify-content: center; align-items: center; min-height: 80vh;}.arrow{width: 120px; justify-content: center; display: flex; flex-wrap: wrap;}.line{margin-top: 14px; width: 200px; background: white; height: 35px;}.point{width: 0; height: 0; border-left: 120px solid transparent; border-right: 120px solid transparent; border-bottom: 116px solid white;}.centre{display: flex;justify-content: center;color: white;}</style> </head> <body> <div class="main"><div class="arrow"> <div class="point"></div><div class="line"></div><div class="line"></div><div class="line"></div></div></div><div class="centre"> update mode on don't restart the system</div></body></html>)=====";
-const char *ssid = "samsung2";
-const char *password = "step81570";
+const char *ssid = "";
+const char *password = "";
 
 int valuedelay = 0;
 int sampleBufferValue = 0;
@@ -315,7 +315,7 @@ MDNS.begin("led");
 //#endif
  ArduinoOTA.setHostname("ledesp");
  // ArduinoOTA.setPassword("admin");
- ArduinoOTA.setPasswordHash("94ce92540b9e31cca304d8bd6d7fd65d");
+// ArduinoOTA.setPasswordHash("9dsfsddd65d");
  
  ArduinoOTA.onStart([]() {
     String type;
